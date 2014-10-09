@@ -85,6 +85,6 @@ public class main {
 			}
 		}while(!saisieOK);
 
-		System.out.println("Résultat : " + Calcul.calculer(i, maListeAR, maListeAS, maSaisie));
+		System.out.println("Le remboursement est de " + Calcul.calculer(i, maListeAR, maListeAS, maSaisie)  + " euros");
 	}
 }
