@@ -57,16 +57,7 @@ public class main {
 		    System.exit(0);
 		}
 
-		// ajout d'elements a la liste
 		int i;
-		for (i=0;i<10;i++){
-			// utilisation du contructeur de AR puis AS
-			maListeAR.add(new AR((int)dept[i][0], dept[i][1], dept[i][4], dept[i][7],
-					dept[i][2], dept[i][5]));
-			maListeAS.add(new AS((int)dept[i][0], dept[i][1], dept[i][5], dept[i][7],
-					dept[i][3], dept[i][6]));
-		}
-
 		Saisie maSaisie = new Saisie();
 		boolean saisieOK = false;
 
