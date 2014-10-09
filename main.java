@@ -57,17 +57,27 @@ public class main {
 		    System.exit(0);
 		}
 
+		// ajout d'elements a la liste
 		int i;
+		for (i=0;i<10;i++){
+			// utilisation du contructeur de AR puis AS
+			maListeAR.add(new AR((int)dept[i][0], dept[i][1], dept[i][4], dept[i][7],
+					dept[i][2], dept[i][5]));
+			maListeAS.add(new AS((int)dept[i][0], dept[i][1], dept[i][5], dept[i][7],
+					dept[i][3], dept[i][6]));
+		}
 
 		Saisie maSaisie = new Saisie();
-
 		boolean saisieOK = false;
 
+		//Faire tant que saisieOK n'est pas a true
 		do{
 			boolean trouve = false;
 			i = 0;
 
+			//Tant que qu'on ne trouve pas et qu'on n'est pas à la fin de la liste maListeAR
 			while(!trouve && i<maListeAR.size()){
+				//Si le numero de departement saisi est egal à un des numeros des departement dans la liste maListeAR
 				if(maSaisie.getNumDept()==maListeAR.get(i).getDept()){
 					trouve = true;
 				}else{
@@ -75,13 +85,16 @@ public class main {
 				}
 			}
 
+			//Si on a trouve alors saisieOK passe a true
 			if(trouve){
 				saisieOK = true;
 			}
+			//Sinon on va lui demander de resaisir le departement
 			else{
 				Scanner deptObjet = new Scanner(System.in);
 				System.out.println("Département non trouvé; veuillez resaisir");
-				maSaisie.setNumDept(deptObjet.nextInt());
+				maSaisie = new Saisie();
+				//maSaisie.setNumDept(deptObjet.nextInt());
 			}
 		}while(!saisieOK);
 
