@@ -59,7 +59,7 @@ public class main {
 						curseurResultat.getDouble("tarifHoraireJS"), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmARJS")
 						, curseurResultat.getDouble("kmARWE")));
 				maListeAS.add(new AS(curseurResultat.getInt("departement"), curseurResultat.getDouble("prisEnCharge") ,
-						curseurResultat.getDouble(5), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmASJS")
+						curseurResultat.getDouble("tarifHoraireJS"), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmASJS")
 						, curseurResultat.getDouble("kmASWE")));
 			 }
 
