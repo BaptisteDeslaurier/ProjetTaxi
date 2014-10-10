@@ -31,48 +31,45 @@ public class main {
 		    System.exit(0);
 		}
 
-		//Creation d'un objet de type Connection
+		//Création d'un objet de type Connection
     	Connection maConnect = null;
 
     	try{
     		String url = "jdbc:postgresql://172.16.99.2:5432/bdeslaurier";
     		maConnect = DriverManager.getConnection(url, "b.deslaurier", "P@ssword");
     	}catch(Exception e){
-    		System.out.println("Une erreur est survenue lors de la connexion a la base de donnee");
+    		System.out.println("Une erreur est survenue lors de la connexion à la base de donnée");
     		System.exit(0);
-    	}
-
-    	Statement maReq = null;
-
-    	try{
-    		maReq = maConnect.createStatement();
-    	}catch(Exception e){
-
     	}
 
     	String texteRequete = "select * from \"taxi\".\"tarif\"";
 
-		// definition de l'objet qui recuperera le resultat de l'execution de la requete :
+		// définition de l'objet qui récupérera le résultat de l'exécution de la requête :
+		ResultSet curseurResultat = null;
 		try {
-			ResultSet curseurResultat = maReq.executeQuery(texteRequete);
+			Statement maReq = maConnect.createStatement();
+			curseurResultat = maReq.executeQuery(texteRequete);
 
-			// tant qu'il y a encore une ligne resultat a lire
+			// Récupération des détails du résultats
+	         ResultSetMetaData detailsDonnees = curseurResultat.getMetaData();
+
+			// tant qu'il y a encore une ligne résultat à lire
 			while(curseurResultat.next()){
-				maListeAR.add(new AR(curseurResultat.getInt(0), curseurResultat.getDouble(1) ,
-						curseurResultat.getDouble(4), curseurResultat.getDouble(7), curseurResultat.getDouble(2)
-						, curseurResultat.getDouble(5)));
-				maListeAS.add(new AS(curseurResultat.getInt(0), curseurResultat.getDouble(1) ,
-						curseurResultat.getDouble(5), curseurResultat.getDouble(7), curseurResultat.getDouble(3)
-						, curseurResultat.getDouble(6)));
+				maListeAR.add(new AR(curseurResultat.getInt("departement"), curseurResultat.getDouble("prisEnCharge") ,
+						curseurResultat.getDouble("tarifHoraireJS"), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmARJS")
+						, curseurResultat.getDouble("kmARWE")));
+				maListeAS.add(new AS(curseurResultat.getInt("departement"), curseurResultat.getDouble("prisEnCharge") ,
+						curseurResultat.getDouble(5), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmASJS")
+						, curseurResultat.getDouble("kmASWE")));
 			 }
 
-			// on ferme le flux resultat
-			 curseurResultat.close();
+			// on ferme le flux résultat
+			// curseurResultat.close();
 
-			// on ferme l'objet lie a la connexion
+			// on ferme l'objet lié à la connexion
 			 maConnect.close();
 		} catch (SQLException e) {
-		    System.out.println("La requete ne retourne aucun resultat !!!");
+		    System.out.println("La requête ne retourne aucun résultat !!!");
 		    System.exit(0);
 		}
 
