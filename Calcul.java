@@ -57,7 +57,7 @@ public class Calcul {
 
 						//Si le trajet dépasse 1h
 						if(txtTemps > 1){
-							montantRemb += montantRemb + (txtTemps * maListeAR.get(i).getHoraireNW());
+							montantRemb = montantRemb + (txtTemps * maListeAR.get(i).getHoraireNW());
 						}
 				}
 

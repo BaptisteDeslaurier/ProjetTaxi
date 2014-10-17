@@ -32,6 +32,8 @@ import rembWBP.AS;
 import rembv2.Saisie;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class GUI extends JFrame {
 
@@ -73,6 +75,27 @@ public class GUI extends JFrame {
 		contentPane.add(lblDpartement);
 
 		txtDept = new JTextField();
+		txtDept.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				int lastCharIndex = txtDept.getText().length();
+
+				if (lastCharIndex != 0) {
+					txtDept.setEnabled(true);
+					String oldString = txtDept.getText();
+					char lastChar = txtDept.getText().charAt(lastCharIndex - 1);
+					if (Character.isDigit(lastChar) == true){
+						txtDept.setText(oldString);
+					}else{
+						txtDept.setText(oldString.substring(0, lastCharIndex - 1));
+					}
+
+					if (txtDept.getText().length() > 2){
+						txtDept.setText(oldString.substring(0, lastCharIndex - 1));
+					}
+				}
+			}
+		});
 		txtDept.setBounds(121, 12, 114, 19);
 		contentPane.add(txtDept);
 		txtDept.setColumns(10);
