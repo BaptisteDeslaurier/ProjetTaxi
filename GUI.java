@@ -121,11 +121,53 @@ public class GUI extends JFrame {
 		contentPane.add(lblKm);
 
 		txtTemps = new JTextField();
+		txtTemps.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				int lastCharIndex = txtTemps.getText().length();
+
+				if (lastCharIndex != 0) {
+					txtTemps.setEnabled(true);
+					String oldString = txtTemps.getText();
+					char lastChar = txtTemps.getText().charAt(lastCharIndex - 1);
+					if (Character.isDigit(lastChar) == true){
+						txtTemps.setText(oldString);
+					}else{
+						txtTemps.setText(oldString.substring(0, lastCharIndex - 1));
+					}
+
+					if (txtTemps.getText().length() > 2){
+						txtTemps.setText(oldString.substring(0, lastCharIndex - 1));
+					}
+				}
+			}
+		});
 		txtTemps.setBounds(78, 122, 114, 19);
 		contentPane.add(txtTemps);
 		txtTemps.setColumns(10);
 
 		txtKm = new JTextField();
+		txtKm.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				int lastCharIndex = txtKm.getText().length();
+
+				if (lastCharIndex != 0) {
+					txtKm.setEnabled(true);
+					String oldString = txtKm.getText();
+					char lastChar = txtKm.getText().charAt(lastCharIndex - 1);
+					if (Character.isDigit(lastChar) == true){
+						txtKm.setText(oldString);
+					}else{
+						txtKm.setText(oldString.substring(0, lastCharIndex - 1));
+					}
+
+					if (txtKm.getText().length() > 2){
+						txtKm.setText(oldString.substring(0, lastCharIndex - 1));
+					}
+				}
+			}
+		});
 		txtKm.setBounds(50, 151, 114, 19);
 		contentPane.add(txtKm);
 		txtKm.setColumns(10);
