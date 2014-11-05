@@ -1,6 +1,5 @@
 package rembWBP;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -8,11 +7,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -21,19 +19,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-
-import javax.swing.JTextArea;
-
-import com.sun.java.swing.plaf.windows.resources.windows;
 
 import rembWBP.AR;
 import rembWBP.AS;
-import rembv2.Saisie;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+/**
+ * GUI est l'interface graphique du programme.
+ *
+ * @author BaptisteDeslaurier
+ * @version 1.0
+ */
 
 public class GUI extends JFrame {
 
@@ -59,10 +60,72 @@ public class GUI extends JFrame {
 		});
 	}
 
+	// création des listes
+	List<AR> maListeAR =  new ArrayList<AR>();
+	List<AS> maListeAS =  new ArrayList<AS>();
+	
 	/**
 	 * Create the frame.
 	 */
 	public GUI() {
+		//Code exécuté a l'ouverture de l'application
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				try{
+					Class.forName("org.postgresql.Driver");
+				} catch (Exception e1) {
+					JOptionPane jopDriver = new JOptionPane();
+					jopDriver.showMessageDialog(null, "Driver PostgreSQL introuvable !!!", "Erreur", JOptionPane.ERROR_MESSAGE);
+				}
+
+				//Création d'un objet de type Connection
+		    	Connection maConnect = null;
+
+		    	try{
+		    		// URL lycée interne
+		    		//String url = "jdbc:postgresql://172.16.99.2:5432/bdeslaurier";
+		    		// URL lycée externe
+		    		String url = "jdbc:postgresql://bts.bts-malraux72.net:62543/bdeslaurier";
+		    		maConnect = DriverManager.getConnection(url, "b.deslaurier", "passe");
+		    	}catch(Exception e2){
+		    		JOptionPane jopBDD = new JOptionPane();
+		    		jopBDD.showMessageDialog(null, "Connection à la base de donnée impossible !!!", "Erreur", JOptionPane.ERROR_MESSAGE);
+		    	}
+
+		    	String texteRequete = "select * from \"taxi\".\"tarif\"";
+
+				// définition de l'objet qui récupérera le résultat de l'exécution de la requête :
+				ResultSet curseurResultat = null;
+				try {
+					Statement maReq = maConnect.createStatement();
+					curseurResultat = maReq.executeQuery(texteRequete);
+
+					// Récupération des détails du résultats
+			         ResultSetMetaData detailsDonnees = curseurResultat.getMetaData();
+
+					// tant qu'il y a encore une ligne résultat à lire
+					while(curseurResultat.next()){
+						maListeAR.add(new AR(curseurResultat.getInt("departement"), curseurResultat.getDouble("prisEnCharge") ,
+								curseurResultat.getDouble("tarifHoraireJS"), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmARJS")
+								, curseurResultat.getDouble("kmARWE")));
+						maListeAS.add(new AS(curseurResultat.getInt("departement"), curseurResultat.getDouble("prisEnCharge") ,
+								curseurResultat.getDouble("tarifHoraireJS"), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmASJS")
+								, curseurResultat.getDouble("kmASWE")));
+					 }
+
+					// on ferme le flux résultat
+					curseurResultat.close();
+
+					// on ferme l'objet lié à la connexion
+					 maConnect.close();
+				} catch (SQLException e3) {
+					//Boîte du message d'erreur
+					JOptionPane jopReqSQL = new JOptionPane();
+					jopReqSQL.showMessageDialog(null, "Aucune donnée !!!", "Erreur", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -237,79 +300,26 @@ public class GUI extends JFrame {
 		contentPane.add(btnAnnuler);
 
 		JButton btnCalcul = new JButton("Calcul");
-		btnCalcul.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
 		btnCalcul.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
 				java.text.DecimalFormat df = new java.text.DecimalFormat("0.##");
 
-				// crÃ©ation d'une liste
-				List<AR> maListeAR =  new ArrayList<AR>();
-				List<AS> maListeAS =  new ArrayList<AS>();
-
 				//Remise du lblDpartementInconnu en invisible dans le cas ou il a saisie un département non trouvée auparavant
 				lblDpartementInconnu.setVisible(false);
-
-				try{
-					Class.forName("org.postgresql.Driver");
-				} catch (Exception e1) {
-				    System.out.println("Driver PostgreSQL introuvable !!!");
-				    System.exit(0);
-				}
-
-				//Création d'un objet de type Connection
-		    	Connection maConnect = null;
-
-		    	try{
-		    		String url = "jdbc:postgresql://172.16.99.2:5432/bdeslaurier";
-		    		maConnect = DriverManager.getConnection(url, "b.deslaurier", "passe");
-		    	}catch(Exception e2){
-		    		System.out.println("Une erreur est survenue lors de la connexion à la base de donnée");
-		    		System.exit(0);
-		    	}
-
-		    	String texteRequete = "select * from \"taxi\".\"tarif\"";
-
-				// définition de l'objet qui récupérera le résultat de l'exécution de la requête :
-				ResultSet curseurResultat = null;
-				try {
-					Statement maReq = maConnect.createStatement();
-					curseurResultat = maReq.executeQuery(texteRequete);
-
-					// Récupération des détails du résultats
-			         ResultSetMetaData detailsDonnees = curseurResultat.getMetaData();
-
-					// tant qu'il y a encore une ligne résultat à lire
-					while(curseurResultat.next()){
-						maListeAR.add(new AR(curseurResultat.getInt("departement"), curseurResultat.getDouble("prisEnCharge") ,
-								curseurResultat.getDouble("tarifHoraireJS"), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmARJS")
-								, curseurResultat.getDouble("kmARWE")));
-						maListeAS.add(new AS(curseurResultat.getInt("departement"), curseurResultat.getDouble("prisEnCharge") ,
-								curseurResultat.getDouble("tarifHoraireJS"), curseurResultat.getDouble("tarifHoraireWE"), curseurResultat.getDouble("kmASJS")
-								, curseurResultat.getDouble("kmASWE")));
-					 }
-
-					// on ferme le flux résultat
-					curseurResultat.close();
-
-					// on ferme l'objet lié à la connexion
-					 maConnect.close();
-				} catch (SQLException e3) {
-				    System.out.println("La requête ne retourne aucun résultat !!!");
-				    System.exit(0);
-				}
-
+				//Remise du lblPrix en invisible dans le cas ou l'utilisateur veut refaire un calcul et qu'il met un département inconnu
+				lblPrix.setVisible(false);
+				
 				int i;
 				boolean saisieOK = false;
 
+				//Faire tant que la saisie du département n'est pas trouvé dans la liste
 				do{
 					boolean trouve = false;
 					i = 0;
 
+					//Tant qu'on n'as pas trouvé et pas fini la liste
 					while(!trouve && i<maListeAR.size()){
 						if(Integer.parseInt(txtDept.getText())==maListeAR.get(i).getDept()){
 							trouve = true;
@@ -318,28 +328,32 @@ public class GUI extends JFrame {
 						}
 					}
 
+					//Si on a trouvé on va passé la saisieOK à vrai sinon on affichera un message pour prévenir que le département n'existe pas
 					if(trouve){
 						saisieOK = true;
 					}
 					else{
-						Scanner deptObjet = new Scanner(System.in);
 						txtDept.setText("");
 						lblDpartementInconnu.setVisible(true);
 					}
 				}while(!saisieOK);
 
 				int tps = 0;
+				//Essaye de passer le temps saisie en entier si cela ni arrive pas on affichera une boite de dialogue le prévenant sur sa mauvaise saisie
 				try{
 					tps = Integer.parseInt(txtTemps.getText());
 				}catch (Exception e2) {
-					System.exit(0);
+					JOptionPane jopConvHeure = new JOptionPane();
+					jopConvHeure.showMessageDialog(null, "L'heure saisie n'est pas valide (entier) !!!", "Erreur", JOptionPane.ERROR_MESSAGE);
 				}
 
 				int km = 0;
+				//Essaye de passer les km saisie en entier si cela ni arrive pas on affichera une boite de dialogue le prévenant sur sa mauvaise saisie
 				try{
 					km = Integer.parseInt(txtKm.getText());
 				}catch (Exception e2) {
-					System.exit(0);
+					JOptionPane jopConvKm = new JOptionPane();
+					jopConvKm.showMessageDialog(null, "Le kilométrage saisi n'est pas valide (entier) !!!", "Erreur", JOptionPane.ERROR_MESSAGE);
 				}
 
 				lblPrix.setText("Le remboursement est de " + df.format(Calcul.calculer(i, maListeAR, maListeAS, rdbtnAr.isSelected(), rdbtnAs.isSelected(), rdbtnJ.isSelected(), rdbtnN.isSelected(), rdbtnS.isSelected(), rdbtnWe.isSelected(), tps, km)) + " euros");
